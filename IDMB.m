@@ -38,14 +38,18 @@ disp(cost_matrix);
 disp("Note: rows are task cost for one agent")
 disp(' ');
 cost_matrix_start = cost_matrix;
+
 % Initialize a flag to check if all tasks are assigned
 all_tasks_assigned = false;
+
 task_allocations_exact_assigment = zeros(num_tasks, 2);
 iter = 0;
 
+% Arrays To Save Correct Matches
 correct_assignment_agents = [];
 correct_assignment_tasks = [];
-    
+
+% Arrays To Calculate Non-Correct Matches
 unassigned_tasks = 1:num_tasks_start;
 unsasinged_agents = 1:num_agents_start;
 
@@ -55,10 +59,12 @@ while all_tasks_assigned == false
     disp(" ")
     disp(" ")
     disp(" ")
+
     if num_agents < 1
         continue
     end
-    task_allocations = zeros(num_tasks, 2);
+    
+    task_allocations = zeros(num_tasks, 2); % Array To Save Matches In Current Iteration. Later I will create Tables using this array 
     for auctioneer = 1:num_agents
             %auctioneer = agents(auctioneer_index);
             % Announce the task to other robots
@@ -98,13 +104,11 @@ while all_tasks_assigned == false
             %Remove Assigned agents from agent list
             if ~ismember(agents(winner_index), assigned_agents_storage)
                 if numel(assigned_agents_storage) < num_agents_start
+                    % To Store Assigned Agents
                     assigned_agents_storage(end+1) = agents(winner_index);
-                    % Mark the task as assigned
-                    %tasks(auctioneer) = 0;
                 end
             end
     
-            %[unique_ones,~,idx] = unique(task_allocations(:,2));
     
             task_allocations_table = array2table(task_allocations, 'VariableNames', {'Task', 'Allocation'});    
     end
@@ -121,8 +125,6 @@ while all_tasks_assigned == false
         rows = task_allocations_table.Allocation == agents(agent);
         result = task_allocations_table(rows,:);
         results = [results;result];
-        %result_array = table2array(result);
-        %disp(results);
         results_array = table2array(result);
         if size(results_array, 1)>1
            for i = 1:size(results_array, 1)
@@ -134,11 +136,8 @@ while all_tasks_assigned == false
        % index parameter
          correct_assignment_tasks(end + 1) = results_array(1,1);
          correct_assignment_agents(end + 1) = agents(agent);
-       %else
-          %unsasinged_agents(end + 1) = agent;
        end
         
-        %tasks_to_agents(end + 1) = table2array(result);
         
     end
     
@@ -153,9 +152,7 @@ while all_tasks_assigned == false
     % Get Task With Lowest Cost If There Is An Agent Assigned to Multiple Tasks
     for agent_index = 1:num_agents
         i = agents(agent_index);
-        %if i == 0
-          %continue
-        %end
+
         if ~isempty(tasks_to_agents)
             results_table = array2table(tasks_to_agents, 'VariableNames', {'Task', 'Allocation'});
             selected_rows = results_table.Task(results_table.Allocation == i);
@@ -181,7 +178,7 @@ while all_tasks_assigned == false
                 %results_table(results_table.Task == min_cost_task,:) = [];
                 unassigned_tasks = setdiff((1:num_tasks_start), correct_assignment_tasks);
                 unassigned_agents = setdiff((1:num_agents_start), correct_assignment_agents);
-                %disp("Multi-Tasks For R" + i)
+
             end
         end
 
@@ -236,7 +233,7 @@ for agent_ref_index = 1:numel(correct_assignment_agents)
         cost_sum_swap = cost_ref_swap + cost_comp_swap;
         if cost_sum_swap < cost_sum
             swap_count = swap_count+1;
-            % İki dizinin elemanlarını yer değiştirin
+            % Swap Elements In Tasks Array If Necessary
             temp = correct_assignment_tasks(index_ref_task);
             correct_assignment_tasks(index_ref_task) = correct_assignment_tasks(index_comp_task);
             correct_assignment_tasks(index_comp_task) = temp;
@@ -276,7 +273,7 @@ scatter(agent_locations(:, 1), agent_locations(:, 2), 100, 'filled', 'MarkerFace
 scatter(task_locations(:, 1), task_locations(:, 2), 100, 'filled', 'MarkerFaceColor', 'r', 'Marker', '^');
 
 
-% Draw green lines
+% Draw Green Lines To Visualize Matches
 for i = 1:length(correct_assignment_agents)
     agent_idx = correct_assignment_agents(i);
     task_idx = correct_assignment_tasks(i);
