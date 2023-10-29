@@ -19,7 +19,6 @@ tasks = (1:num_tasks)';
 % Initialize the cost matrix %rows are task cost for one agent
 cost_matrix = zeros(num_agents, num_tasks);
 
-
 % Initialize the assigned task array
 assigned_agents_storage = [];
 
@@ -174,8 +173,6 @@ while all_tasks_assigned == false
                 correct_assignment_agents(end + 1) = i;
                 % Now Remove Assigned Tasks row from table and add remanined rows
                 % to unassigned
-                %assigned_row = results_table.Task == min_cost_task;
-                %results_table(results_table.Task == min_cost_task,:) = [];
                 unassigned_tasks = setdiff((1:num_tasks_start), correct_assignment_tasks);
                 unassigned_agents = setdiff((1:num_agents_start), correct_assignment_agents);
 
